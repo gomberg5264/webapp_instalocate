@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webapp</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+
+
+<div class="container">
+    <!-- For getting user input -->
+
+    <form id="f1">
+        <div class="row">
+            <div class="form-group col-sm-2 col-sm-offset-5">
+                <label for="flightId">Flight ID:</label>
+                <input id="flightId" type="text" class="form-control">
+            </div>
+        </div>
+        <div class="row">
+            <button type="button" class="btn btn-primary col-sm-offset-5">Submit</button>
+            <button id="showDetails" type="button" class="btn btn-primary">Show Details</button>
+        </div>
+    </form>
+
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Flight Details</h4>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Right click on map to zoom out -->
+<div id="map"></div>
+
+<!-- For google maps style -->
+<script src="js/styles.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var sourceMarker="", destinationMarker="", planeMarker="", sourceCoordinates={}, destinationCoordinates={}, planeCoordinates={}, flightPath= "";
+
+        $('#f1').submit(function (e)
+        {
+            if(sourceMarker)
+                sourceMarker.setMap(null)
+
+            if(destinationMarker)
+                destinationMarker.setMap(null)
+
+            if(planeMarker)
+                planeMarker.setMap(null)
+
+            if(flightPath)
+                flightPath.setMap(null)
+
+            var flightId = $('#flightId').val();
+
+            $.ajax({
+                url: "http://localhost:2000/api/getFlightDetails?flightId="+flightId,
+                type: 'post',
+                success: [function (response) {
+
+//                    alert(JSON.stringify(response));
+
+
+
+                    var sourceCoordinates = {
+                        lat: Number(response.sourceCoordinatesLat),
+                        lng: Number(response.sourceCoordinatesLng)
+                    }
+
+                    var destinationCoordinates = {
+                        lat: Number(response.destinationCoordinatesLat),
+                        lng: Number(response.destinationCoordinatesLng)
+                    }
+
+                    var planeCoordinates = {
+                        lat: Number(response.planeCoordinatesLat),
+                        lng: Number(response.planeCoordinatesLng)
+                    }
+
+                    var flightPlanCoordinates = [];
+
+                    sourceMarker = new google.maps.Marker({
+                        position: sourceCoordinates,
+                        map: map,
+                        label: response.source
+                    });
+
+                    destinationMarker = new google.maps.Marker({
+                        position: destinationCoordinates,
+                        map: map,
+                        label: response.destination
+                    });
+
+                    planeMarker = new google.maps.Marker({
+                        position: planeCoordinates,
+                        icon: {
+                            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                            scale: 3
+                        },
+                        map:map
+                    });
+
+                    flightPlanCoordinates.push(sourceCoordinates)
+
+                    for(var i=0;i<response.waypoints.length;i++)
+                    {
+                        var coordinates={lat:Number(response.waypoints[i]["lat"]),lng:Number(response.waypoints[i]["lng"])}
+                        flightPlanCoordinates.push(coordinates)
+                    }
+
+                    flightPlanCoordinates.push(destinationCoordinates)
+
+                    flightPath = new google.maps.Polyline({
+                        path: flightPlanCoordinates,
+                        geodesic: true,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2
+                    });
+
+
+                    flightPath.setMap(map);
+
+                    data = "<p> Flight ID :"+response.flightId+"<br>Source Airport :"+response.sourceAirport+"<br>Source Airport Name :"+response.sourceAirportName+"<br>Source Country :"+response.source
+                    data += "<br>Destination Airport :"+response.destinationAirport+"<br>Destination Airport Name :"+response.destinationAirportName+"<br>Destination Country :"+response.destination
+                    data += "<br> Arrival Time(in seconds) :"+response.arrivalTime+"<br> Departure Time(in seconds) :"+response.departureTime+"<br>Plane :"+response.plane+"</p>"
+
+                    $('.modal-body').html(data)
+                    $('#myModal').modal()
+
+                }]
+            });
+            e.preventDefault();
+        });
+    });
+
+    $('#showDetails').click(function(){
+
+        if($('.modal-body').html()!="")
+        {
+            $('#myModal').modal()
+        }
+
+    });
+
+    window.initMap=function() {
+        var mapOptions={
+            center: new google.maps.LatLng(48.8566,2.3522),
+            zoom: 2,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            styles: styles,
+            panControl: true,
+            zoomControl: true,
+            mapTypeControl: false,
+            streetViewControl : false,
+            scrollwheel: false,
+            zoomControlOptions : {
+                position: google.maps.ControlPosition.RIGHT_BOTTOM,
+                style: google.maps.ZoomControlStyle.LARGE
+            }
+        };
+
+        map = new google.maps.Map(document.getElementById('map'), mapOptions); // Creating an instance of Google Maps
+
+    }
+
+</script>
+
+
+
+<!-- For Google Maps API -->
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBcUL7QG5AABe-cCHx73Ss8KrIN3MFChPw&libraries=geometry&callback=initMap">
+</script>
+
+</body>
+</html>
