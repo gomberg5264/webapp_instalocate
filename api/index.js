@@ -5,7 +5,6 @@
 var express = require('express')
 var request = require('request')
 var cheerio = require('cheerio')
-var moment = require('moment')
 
 var api = express.Router();
 
