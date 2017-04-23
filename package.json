@@ -12,11 +12,8 @@
     "body-parser": "^1.17.1",
     "cheerio": "^0.22.0",
     "express": "^4.15.2",
-    "json": "^9.0.6",
-    "moment": "^2.18.1",
     "mongoose": "^4.9.5",
     "morgan": "^1.8.1",
-    "phantom": "^4.0.2",
     "request": "^2.81.0"
   }
 }
