@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="row">
-            <button type="button" class="btn btn-primary col-sm-offset-5">Submit</button>
+            <button type="submit" class="btn btn-primary col-sm-offset-5">Submit</button>
             <button id="showDetails" type="button" class="btn btn-primary">Show Details</button>
         </div>
     </form>
@@ -77,7 +77,7 @@
             var flightId = $('#flightId').val();
 
             $.ajax({
-                url: "http://localhost:2000/api/getFlightDetails?flightId="+flightId,
+                url: "api/getFlightDetails?flightId="+flightId,
                 type: 'post',
                 success: [function (response) {
 
