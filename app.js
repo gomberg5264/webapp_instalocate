@@ -7,12 +7,12 @@ var bodyParser = require('body-parser')
 var logger = require('morgan')
 var path = require('path')
 
-console.log("hello")
+console.log("Server running");
 
 var app = express()
 
 var api = require('./api')
-app.use('/api',api)
+app.use('/api',api);
 
 //Body-Parser Setup
 app.use(bodyParser.json());
@@ -26,11 +26,11 @@ mongoose.connect('mongodb://admin:admin@ds237947.mlab.com:37947/webapp_instaloca
 
 app.use(logger('dev'));
 
-app.use(express.static(path.join(__dirname,'/views')))
+app.use(express.static(path.join(__dirname,'/views')));
 
 app.get('/',function (req,res) {
     res.sendFile("views/index.html")
 });
 
-app.set('port',2000)
-app.listen(app.get('port'))
+app.set('port',(2000||process.env.PORT));
+app.listen(app.get('port'));
