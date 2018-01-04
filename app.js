@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 // mongoose.connect('mongodb://localhost:27017/test');
-mongoose.connect('mongodb://admin:password@ds237947.mlab.com:37947/webapp_instalocate');
+mongoose.connect('mongodb://admin:admin@ds237947.mlab.com:37947/webapp_instalocate');
 
 app.use(logger('dev'));
 
