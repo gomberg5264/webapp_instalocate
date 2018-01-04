@@ -11,7 +11,7 @@ var api = express.Router();
 var storeDetails = require('./storeDetails')
 var getFlightDetails = require('./getFlightDetails')
 
-api.post('/storeDetails',function (req,res) {
+api.get('/storeDetails',function (req,res) {
 
     flightId = req.query.flightId
 
@@ -31,8 +31,9 @@ api.post('/storeDetails',function (req,res) {
 
             // console.log($('script'));
             scripts = $('script')
-            var str = scripts[51].children[0].data
 
+            var str = scripts[54].children[0].data
+            // console.log(str);
             str = str.replace("			var trackpollGlobals = ","")
             str = str.replace(";","")
 
